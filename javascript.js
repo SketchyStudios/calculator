@@ -20,9 +20,10 @@ let secondOperator = ''
 let currentOperation = null
 
 
-
+window.addEventListener("keydown", handleKeyboardInput)
 allClear.addEventListener("click" , clear)
 deleteButton.addEventListener("click", deleteNumber)
+equals.addEventListener("click", evaluate)
 
 
 numberButtons.forEach((button) => {
@@ -32,6 +33,25 @@ numberButtons.forEach((button) => {
 operationButtons.forEach((button) => {
     button.addEventListener("click", () => setOperation(button.textContent))
 } )
+
+
+function handleKeyboardInput(e) {
+    if (e.key >= 0 && e.key <= 9) appendNumber (e.key)
+    if(e.key === ".") appendPoint()
+    if (e.key === "=" || e.key === "Enter") evaluate
+    if(e.key === "backspace") deleteNumber()
+    if (e.key === "Escape") clear()
+    if (e.ley === "+" || e.key === "-" || e.key === "*" || e.key === "/")
+        setOperation(convertOperator(e.key))
+}
+
+function convertOperator(keyboardOperator) {
+    if (keyboardOperator === '/') return '÷'
+    if (keyboardOperator === '*') return '×'
+    if (keyboardOperator === '-') return '−'
+    if (keyboardOperator === '+') return '+'
+  }
+
 
 
 
@@ -77,26 +97,48 @@ function setOperation(operater) {
     shouldResetScreen = true;
 }
 
+function evaluate() {
+    if (currentOperation === null || shouldResetScreen) return
+    if (currentOperation === "/" && currentEntry.textContent === "0") {
+        alert ("You cant divide by 0 silly!")
+        return
+    }
+    secondOperator = currentEntry.textContent
+    currentEntry.textContent = roundResult(
+        operate(currentOperation, firstOperator, secondOperator)
+    )
+    previousEntry.textContent = `${firstOperator} ${currentOperation} ${secondOperator} =`
+    currentOperation = null
+}
 
-
+function roundResult(number) {
+    return Math.round(number * 1000) / 1000
+}
 
 function operate (operater , number1, number2) {
-    if (operationButtons === "+") {
-        return addition()
+number1 = Number(number1)
+number2 = Number(number2)
+
+switch (operater) { 
+
+    case "+": {
+        return addition(number1, number2)
     }
 
-    else if (operationButtons === "-") {
-        return subtraction()
+    case "-": {
+        return subtraction(number1, number2)
     }
 
-    else if (operationButtons === "*") {
-        return multiplication()
+     case "*": {
+        return multiplication(number1, number2)
     }
 
-    else if (operationButtons === "/") {
-        return division()
-    }
+    case "/": {
+        if (secondOperator === 0) return null
+        else return division(number1, number2)
         
+    }
+} 
 }
 
 
